@@ -619,12 +619,12 @@ if (words.length > 0) {
         localStorage.getItem(HSK_KEY);
 
     el("status").textContent = savedHSK
-        ? `📌 กำลังเรียน ${savedHSK}: ${words.length} คำศัพท์`
-        : `📌 โหลดคำศัพท์ล่าสุด ${words.length} คำ`;
+        ? `${savedHSK} : ${words.length}`
+        : `คำศัพท์ล่าสุด : ${words.length}`;
 
 } else {
     el("status").textContent =
-        "เลือกระดับ HSK เพื่อเริ่มเรียน";
+        `${level} : ${words.length}`;
 }
 
 render();
