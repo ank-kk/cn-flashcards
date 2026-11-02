@@ -26,6 +26,7 @@ html {
 body {
     margin: 0;
     min-width: 320px;
+    min-height: 100%;
     font-family: Arial, "Noto Sans Thai", sans-serif;
     background: var(--bg);
     color: var(--dark);
@@ -402,7 +403,7 @@ main {
     }
 }
 /* ========================================
-   Mobile: ล็อกการเลื่อนหน้าจอ
+   Mobile: ล็อกหน้าจอและแก้ขอบสีขาว
 ======================================== */
 
 @media (max-width: 768px) {
@@ -414,8 +415,14 @@ main {
         overscroll-behavior: none;
     }
 
+    /* ให้พื้นหลังของขอบหน้าจอเปลี่ยนตาม Dark Mode */
+    html {
+        background: var(--bg);
+    }
+
     body {
         position: fixed;
         inset: 0;
+        background: var(--bg);
     }
 }
