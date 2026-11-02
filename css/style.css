@@ -32,9 +32,7 @@ body {
     transition: background 0.3s, color 0.3s;
 }
 
-/* =========================
-   Header
-========================= */
+/* Header */
 
 header {
     background: var(--card);
@@ -62,12 +60,9 @@ h1 {
     flex-wrap: wrap;
 }
 
-/* =========================
-   Buttons
-========================= */
+/* Buttons */
 
 button,
-.file-label,
 .hsk-select {
     min-height: 44px;
     border-radius: 10px;
@@ -76,8 +71,7 @@ button,
     font-family: inherit;
 }
 
-button,
-.file-label {
+button {
     border: none;
     background: var(--primary);
     color: white;
@@ -91,8 +85,7 @@ button,
     touch-action: manipulation;
 }
 
-button:active,
-.file-label:active {
+button:active {
     transform: scale(0.98);
 }
 
@@ -105,16 +98,9 @@ button.secondary,
 
 .hsk-select {
     cursor: pointer;
-    font-family: inherit;
 }
 
-input[type="file"] {
-    display: none;
-}
-
-/* =========================
-   Main
-========================= */
+/* Main */
 
 main {
     width: 100%;
@@ -132,9 +118,7 @@ main {
     word-break: break-word;
 }
 
-/* =========================
-   Flashcard
-========================= */
+/* Flashcard */
 
 .card-wrap {
     width: 100%;
@@ -221,9 +205,7 @@ main {
     font-size: 14px;
 }
 
-/* =========================
-   Navigation
-========================= */
+/* Navigation */
 
 .navigation {
     display: flex;
@@ -245,32 +227,7 @@ main {
     white-space: nowrap;
 }
 
-/* =========================
-   Information
-========================= */
-
-.info {
-    max-width: 700px;
-    margin: 35px auto 0;
-    background: var(--card);
-    padding: 22px;
-    border-radius: 16px;
-    line-height: 1.7;
-    overflow-wrap: break-word;
-}
-
-code {
-    display: inline-block;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 3px 7px;
-    border-radius: 5px;
-    margin: 2px;
-}
-
-/* =========================
-   Tablet
-========================= */
+/* Tablet */
 
 @media (max-width: 768px) {
 
@@ -299,9 +256,7 @@ code {
 
 }
 
-/* =========================
-   Mobile
-========================= */
+/* Mobile */
 
 @media (max-width: 600px) {
 
@@ -335,7 +290,6 @@ code {
     }
 
     button,
-    .file-label,
     .hsk-select {
         font-size: 14px;
         padding: 10px 8px;
@@ -397,18 +351,9 @@ code {
         font-size: 14px;
     }
 
-    .info {
-        margin-top: 25px;
-        padding: 16px;
-        border-radius: 14px;
-        font-size: 14px;
-    }
-
 }
 
-/* =========================
-   Small Mobile
-========================= */
+/* Small Mobile */
 
 @media (max-width: 380px) {
 
@@ -435,9 +380,7 @@ code {
 
 }
 
-/* =========================
-   Landscape Mobile
-========================= */
+/* Landscape Mobile */
 
 @media (max-height: 600px) and (orientation: landscape) {
 
@@ -452,10 +395,6 @@ code {
 
     main {
         margin-top: 15px;
-    }
-
-    .info {
-        margin-top: 20px;
     }
 
 }
