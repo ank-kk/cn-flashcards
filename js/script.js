@@ -102,8 +102,13 @@ function changeWord(direction) {
 
     const width = cardSlider.offsetWidth;
 
-    const exitX = direction === "left" ? -width * 1.2 : width * 1.2;
-    const exitRotate = direction === "left" ? -28 : 28;
+    const exitX = direction === "left"
+        ? -width * 1.2
+        : width * 1.2;
+
+    const exitRotate = direction === "left"
+        ? -28
+        : 28;
 
     cardSlider.style.transition =
         "transform 0.3s cubic-bezier(.4, 0, .2, 1), opacity 0.3s ease";
@@ -135,6 +140,7 @@ function changeWord(direction) {
             : -28;
 
         cardSlider.style.transition = "none";
+
         cardSlider.style.transform =
             `translateX(${enterX}px) rotateY(${enterRotate}deg) rotateZ(${enterRotate / 3}deg)`;
 
@@ -170,8 +176,11 @@ function changeWord(direction) {
 let startX = 0;
 let startY = 0;
 let isDragging = false;
+let isHorizontalSwipe = false;
+let currentPointerType = "";
 
 const SWIPE_THRESHOLD = 70;
+const DIRECTION_THRESHOLD = 8;
 
 cardSlider.addEventListener("pointerdown", (event) => {
 
@@ -181,51 +190,129 @@ cardSlider.addEventListener("pointerdown", (event) => {
 
     startX = event.clientX;
     startY = event.clientY;
+
     isDragging = true;
+    isHorizontalSwipe = false;
+    currentPointerType = event.pointerType;
 
     cardSlider.classList.add("dragging");
+
+    // ใช้ Pointer Capture เพื่อให้มือถือยังติดตามนิ้ว
+    // แม้นิ้วจะลากออกนอกพื้นที่การ์ด
     cardSlider.setPointerCapture(event.pointerId);
 });
 
 cardSlider.addEventListener("pointermove", (event) => {
 
-    if (!isDragging) return;
+    // ========================================
+    // Desktop Hover
+    // คงระบบเดิมไว้
+    // ========================================
 
-    const diffX = event.clientX - startX;
-    const diffY = event.clientY - startY;
+    if (
+        !isDragging &&
+        event.pointerType === "mouse" &&
+        !cardSlider.classList.contains("animating")
+    ) {
 
-    if (Math.abs(diffX) > Math.abs(diffY)) {
+        const rect = cardSlider.getBoundingClientRect();
 
-        const rotateY = Math.max(
-            -20,
-            Math.min(20, diffX / 10)
-        );
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
 
-        const rotateZ = Math.max(
-            -8,
-            Math.min(8, diffX / 30)
-        );
+        const percentX = mouseX / rect.width - 0.5;
+        const percentY = mouseY / rect.height - 0.5;
 
-        const opacity = Math.max(
-            0.72,
-            1 - Math.abs(diffX) / 900
-        );
+        const rotateY = percentX * 10;
+        const rotateX = percentY * -8;
 
         cardSlider.style.transform =
-            `translateX(${diffX}px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
+            `translateY(-6px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 
-        cardSlider.style.opacity = opacity;
+        return;
     }
-});
 
-cardSlider.addEventListener("pointerup", (event) => {
+    // ========================================
+    // Swipe
+    // ========================================
 
-    if (!isDragging) return;
+    if (!isDragging) {
+        return;
+    }
 
     const diffX = event.clientX - startX;
     const diffY = event.clientY - startY;
 
+    // ตรวจสอบทิศทางเมื่อเริ่มลาก
+    if (!isHorizontalSwipe) {
+
+        // ถ้ายังลากไม่ไกลพอ ให้รอตรวจสอบทิศทาง
+        if (
+            Math.abs(diffX) < DIRECTION_THRESHOLD &&
+            Math.abs(diffY) < DIRECTION_THRESHOLD
+        ) {
+            return;
+        }
+
+        // ถ้าลากแนวตั้งมากกว่า ไม่ถือว่าเป็น Swipe การ์ด
+        if (Math.abs(diffY) > Math.abs(diffX)) {
+            return;
+        }
+
+        isHorizontalSwipe = true;
+    }
+
+    // ป้องกันการ Scroll ระหว่าง Swipe แนวนอนบนมือถือ
+    if (event.pointerType === "touch") {
+        event.preventDefault();
+    }
+
+    // จำกัดระยะการลากเล็กน้อย
+    // ทำให้การ์ดยังตามนิ้ว แต่ไม่เคลื่อนเร็วเกินไป
+    const dragX = diffX;
+
+    // ใช้การหมุนแบบเดียวกับ Desktop
+    const rotateY = Math.max(
+        -20,
+        Math.min(20, dragX / 10)
+    );
+
+    const rotateZ = Math.max(
+        -8,
+        Math.min(8, dragX / 30)
+    );
+
+    const opacity = Math.max(
+        0.72,
+        1 - Math.abs(dragX) / 900
+    );
+
+    // เพิ่มความรู้สึก 3D บนมือถือ
+    // การ์ดจะยกขึ้นเล็กน้อยระหว่างลาก
+    const translateY = event.pointerType === "touch"
+        ? -2
+        : 0;
+
+    cardSlider.style.transform =
+        `translateX(${dragX}px) translateY(${translateY}px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
+
+    cardSlider.style.opacity = opacity;
+}, { passive: false });
+
+function finishSwipe(event) {
+
+    if (!isDragging) {
+        return;
+    }
+
+    const diffX = event.clientX - startX;
+    const diffY = event.clientY - startY;
+
+    const wasHorizontalSwipe = isHorizontalSwipe;
+
     isDragging = false;
+    isHorizontalSwipe = false;
+
     cardSlider.classList.remove("dragging");
 
     try {
@@ -234,13 +321,19 @@ cardSlider.addEventListener("pointerup", (event) => {
         // ไม่จำเป็นต้องทำอะไร
     }
 
+    // ========================================
     // ปัดสำเร็จ
+    // ========================================
+
     if (
+        wasHorizontalSwipe &&
         Math.abs(diffX) >= SWIPE_THRESHOLD &&
         Math.abs(diffX) > Math.abs(diffY)
     ) {
 
-        const direction = diffX < 0 ? "left" : "right";
+        const direction = diffX < 0
+            ? "left"
+            : "right";
 
         // Reset ก่อนเริ่ม Animation
         cardSlider.style.transition = "none";
@@ -252,14 +345,17 @@ cardSlider.addEventListener("pointerup", (event) => {
         return;
     }
 
-    // ลากไม่ถึงระยะ → เด้งกลับ
-    if (Math.abs(diffX) > 10) {
+    // ========================================
+    // ปัดไม่ถึงระยะ → เด้งกลับ
+    // ========================================
+
+    if (wasHorizontalSwipe && Math.abs(diffX) > 10) {
 
         cardSlider.style.transition =
             "transform 0.4s cubic-bezier(.16, 1, .3, 1), opacity 0.3s ease";
 
         cardSlider.style.transform =
-            "translateX(0) rotateY(0deg) rotateZ(0deg)";
+            "translateX(0) translateY(0) rotateY(0deg) rotateZ(0deg)";
 
         cardSlider.style.opacity = "1";
 
@@ -272,51 +368,58 @@ cardSlider.addEventListener("pointerup", (event) => {
         return;
     }
 
+    // ========================================
     // แตะหรือคลิก → พลิกการ์ด
-    card.classList.toggle("flipped");
-});
+    // ========================================
 
-// ========================================
-// 3D Hover Effect (เฉพาะ Mouse)
-// ========================================
-
-cardSlider.addEventListener("pointermove", (event) => {
-
-    // ถ้ากำลังลากหรือเป็น Touch ไม่ใช้ Hover
+    // พลิกเฉพาะเมื่อแทบไม่ได้ลาก
     if (
-        isDragging ||
-        event.pointerType !== "mouse" ||
-        cardSlider.classList.contains("animating")
+        Math.abs(diffX) < 10 &&
+        Math.abs(diffY) < 10
     ) {
+        card.classList.toggle("flipped");
+    }
+}
+
+cardSlider.addEventListener("pointerup", finishSwipe);
+
+cardSlider.addEventListener("pointercancel", (event) => {
+
+    if (!isDragging) {
         return;
     }
 
-    const rect = cardSlider.getBoundingClientRect();
+    isDragging = false;
+    isHorizontalSwipe = false;
 
-    const mouseX =
-        event.clientX - rect.left;
+    cardSlider.classList.remove("dragging");
 
-    const mouseY =
-        event.clientY - rect.top;
-
-    // คำนวณตำแหน่งเมาส์จากจุดกลาง
-    const percentX =
-        mouseX / rect.width - 0.5;
-
-    const percentY =
-        mouseY / rect.height - 0.5;
-
-    // จำกัดองศาการเอียง
-    const rotateY = percentX * 10;
-    const rotateX = percentY * -8;
+    cardSlider.style.transition =
+        "transform 0.4s cubic-bezier(.16, 1, .3, 1), opacity 0.3s ease";
 
     cardSlider.style.transform =
-        `translateY(-6px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        "translateX(0) translateY(0) rotateY(0deg) rotateZ(0deg)";
+
+    cardSlider.style.opacity = "1";
+
+    setTimeout(() => {
+        cardSlider.style.transition = "";
+        cardSlider.style.transform = "";
+        cardSlider.style.opacity = "";
+    }, 400);
 });
+
+// ========================================
+// 3D Hover Effect - Mouse Leave
+// ========================================
 
 cardSlider.addEventListener("pointerleave", (event) => {
 
-    if (isDragging || event.pointerType !== "mouse") {
+    // ไม่กระทบระบบลาก
+    if (
+        isDragging ||
+        event.pointerType !== "mouse"
+    ) {
         return;
     }
 

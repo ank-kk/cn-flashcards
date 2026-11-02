@@ -401,3 +401,21 @@ main {
         margin-top: 15px;
     }
 }
+/* ========================================
+   Mobile: ล็อกการเลื่อนหน้าจอ
+======================================== */
+
+@media (max-width: 768px) {
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+    }
+
+    body {
+        position: fixed;
+        inset: 0;
+    }
+}
