@@ -1,0 +1,461 @@
+:root {
+    --primary: #e53935;
+    --dark: #1f2937;
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --border: #d1d5db;
+}
+
+body.dark {
+    --dark: #f3f4f6;
+    --bg: #111827;
+    --card: #1f2937;
+    --muted: #c4c9d1;
+    --border: #374151;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    font-family: Arial, "Noto Sans Thai", sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    transition: background 0.3s, color 0.3s;
+}
+
+/* =========================
+   Header
+========================= */
+
+header {
+    background: var(--card);
+    padding: 16px 24px;
+    box-shadow: 0 2px 10px #0001;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    white-space: nowrap;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* =========================
+   Buttons
+========================= */
+
+button,
+.file-label,
+.hsk-select {
+    min-height: 44px;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+button,
+.file-label {
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+button:active,
+.file-label:active {
+    transform: scale(0.98);
+}
+
+button.secondary,
+.hsk-select {
+    background: var(--card);
+    color: var(--dark);
+    border: 1px solid var(--border);
+}
+
+.hsk-select {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+/* =========================
+   Main
+========================= */
+
+main {
+    width: 100%;
+    max-width: 850px;
+    margin: 35px auto;
+    padding: 0 18px 30px;
+}
+
+.status {
+    text-align: center;
+    color: var(--muted);
+    margin: 15px auto;
+    min-height: 24px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* =========================
+   Flashcard
+========================= */
+
+.card-wrap {
+    width: 100%;
+    perspective: 1200px;
+    height: min(400px, 55vw);
+    min-height: 280px;
+    max-width: 700px;
+    margin: auto;
+}
+
+.card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    transform-style: preserve-3d;
+    transition: transform 0.55s;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.face {
+    position: absolute;
+    inset: 0;
+
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: 0 10px 35px #0002;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 35px;
+    text-align: center;
+    overflow: auto;
+}
+
+.back {
+    transform: rotateY(180deg);
+}
+
+.chinese {
+    font-size: clamp(48px, 12vw, 92px);
+    font-weight: bold;
+    color: var(--primary);
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.pinyin {
+    font-size: clamp(18px, 4vw, 25px);
+    color: var(--muted);
+    margin-top: 18px;
+    min-height: 35px;
+    word-break: break-word;
+}
+
+.meaning {
+    font-size: clamp(24px, 6vw, 32px);
+    margin: 8px;
+    word-break: break-word;
+}
+
+.english {
+    font-size: clamp(16px, 4vw, 20px);
+    color: var(--muted);
+    word-break: break-word;
+}
+
+.hint {
+    margin-top: 25px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* =========================
+   Navigation
+========================= */
+
+.navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 25px;
+    width: 100%;
+}
+
+.navigation button {
+    min-width: 120px;
+}
+
+.progress {
+    font-weight: bold;
+    min-width: 80px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* =========================
+   Information
+========================= */
+
+.info {
+    max-width: 700px;
+    margin: 35px auto 0;
+    background: var(--card);
+    padding: 22px;
+    border-radius: 16px;
+    line-height: 1.7;
+    overflow-wrap: break-word;
+}
+
+code {
+    display: inline-block;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 3px 7px;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+/* =========================
+   Tablet
+========================= */
+
+@media (max-width: 768px) {
+
+    header {
+        padding: 16px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .controls {
+        justify-content: center;
+    }
+
+    main {
+        margin: 25px auto;
+        padding: 0 16px 25px;
+    }
+
+    .card-wrap {
+        height: 380px;
+    }
+
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 600px) {
+
+    body {
+        min-width: 0;
+    }
+
+    header {
+        padding: 14px 12px;
+        gap: 12px;
+    }
+
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    .controls {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        width: 100%;
+        gap: 8px;
+    }
+
+    .controls > * {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .hsk-select {
+        grid-column: span 2;
+    }
+
+    button,
+    .file-label,
+    .hsk-select {
+        font-size: 14px;
+        padding: 10px 8px;
+        min-height: 46px;
+    }
+
+    main {
+        margin: 18px auto;
+        padding: 0 12px 25px;
+    }
+
+    .status {
+        margin: 12px auto;
+        font-size: 14px;
+    }
+
+    .card-wrap {
+        height: 65vw;
+        min-height: 300px;
+        max-height: 380px;
+    }
+
+    .face {
+        padding: 20px 15px;
+        border-radius: 18px;
+    }
+
+    .chinese {
+        font-size: clamp(46px, 15vw, 72px);
+    }
+
+    .pinyin {
+        margin-top: 12px;
+        min-height: 28px;
+    }
+
+    .meaning {
+        font-size: clamp(23px, 7vw, 30px);
+    }
+
+    .hint {
+        margin-top: 18px;
+        font-size: 12px;
+    }
+
+    .navigation {
+        gap: 8px;
+        margin-top: 18px;
+    }
+
+    .navigation button {
+        min-width: 0;
+        flex: 1;
+        padding: 10px 8px;
+    }
+
+    .progress {
+        min-width: 65px;
+        font-size: 14px;
+    }
+
+    .info {
+        margin-top: 25px;
+        padding: 16px;
+        border-radius: 14px;
+        font-size: 14px;
+    }
+
+}
+
+/* =========================
+   Small Mobile
+========================= */
+
+@media (max-width: 380px) {
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+
+    .hsk-select {
+        grid-column: span 1;
+    }
+
+    .card-wrap {
+        min-height: 270px;
+    }
+
+    .navigation {
+        flex-wrap: wrap;
+    }
+
+    .progress {
+        order: -1;
+        width: 100%;
+    }
+
+}
+
+/* =========================
+   Landscape Mobile
+========================= */
+
+@media (max-height: 600px) and (orientation: landscape) {
+
+    header {
+        padding: 10px 16px;
+    }
+
+    .card-wrap {
+        height: 280px;
+        min-height: 250px;
+    }
+
+    main {
+        margin-top: 15px;
+    }
+
+    .info {
+        margin-top: 20px;
+    }
+
+}
