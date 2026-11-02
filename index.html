@@ -1,112 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#111827">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111827" />
 
     <title>Chinese Flashcards</title>
 
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/style.css" />
 
     <!-- Library สำหรับอ่านไฟล์ Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <header>
-        <h1>🀄 Chinese Flashcards</h1>
+      <h1>🀄 Chinese Flashcards</h1>
 
-        <div class="controls">
+      <div class="controls">
+        <select id="hskSelect" class="hsk-select">
+          <option value="">📚 เลือกระดับ HSK</option>
+          <option value="HSK1">HSK 1</option>
+          <option value="HSK2">HSK 2</option>
+          <option value="HSK3">HSK 3</option>
+          <option value="HSK4">HSK 4</option>
+          <option value="HSK5">HSK 5</option>
+          <option value="HSK6">HSK 6</option>
+        </select>
 
-            <select id="hskSelect" class="hsk-select">
-                <option value="">📚 เลือกระดับ HSK</option>
-                <option value="HSK1">HSK 1</option>
-                <option value="HSK2">HSK 2</option>
-                <option value="HSK3">HSK 3</option>
-                <option value="HSK4">HSK 4</option>
-                <option value="HSK5">HSK 5</option>
-                <option value="HSK6">HSK 6</option>
-            </select>
+        <!-- ปุ่มอัปโหลด Excel -->
+        <button class="secondary" id="uploadBtn" type="button">
+          📂 อัปโหลด Excel
+        </button>
 
-            <button class="secondary" id="pinyinBtn">
-                🔤 ซ่อนพินอิน
-            </button>
+        <input type="file" id="excelUpload" accept=".xlsx,.xls" hidden />
 
-            <button class="secondary" id="darkBtn">
-                🌙 โหมดกลางคืน
-            </button>
+        <button class="secondary" id="pinyinBtn">🔤 ซ่อนพินอิน</button>
 
-            <button class="secondary" id="shuffleBtn">
-                🔀 สุ่มคำศัพท์
-            </button>
+        <button class="secondary" id="darkBtn">🌙 โหมดกลางคืน</button>
 
-        </div>
+        <button class="secondary" id="shuffleBtn">🔀 สุ่มคำศัพท์</button>
+      </div>
     </header>
 
     <main>
+      <div class="status" id="status">เลือกระดับ HSK เพื่อเริ่มเรียน</div>
 
-        <div class="status" id="status">
-            เลือกระดับ HSK เพื่อเริ่มเรียน
-        </div>
+      <!-- Flashcard -->
+      <div class="card-wrap" id="cardWrap">
+        <div class="card-slider" id="cardSlider">
+          <div class="card" id="card">
+            <!-- ด้านหน้า -->
+            <div class="face front">
+              <div class="chinese" id="word">欢迎</div>
 
-        <!-- Flashcard -->
-        <div class="card-wrap" id="cardWrap">
+              <div class="pinyin" id="pinyin">huānyíng</div>
 
-            <div class="card-slider" id="cardSlider">
-
-                <div class="card" id="card">
-
-                    <!-- ด้านหน้า -->
-                    <div class="face front">
-
-                        <div class="chinese" id="word">
-                            欢迎
-                        </div>
-
-                        <div class="pinyin" id="pinyin">
-                            huānyíng
-                        </div>
-
-                        <div class="hint">
-                            คลิกเพื่อดูความหมาย
-                        </div>
-
-                    </div>
-
-                    <!-- ด้านหลัง -->
-                    <div class="face back">
-
-                        <div class="meaning" id="thai">
-                            ยินดีต้อนรับ
-                        </div>
-
-                        <div class="english" id="english">
-                            Welcome
-                        </div>
-
-                        <div class="hint">
-                            คลิกเพื่อกลับด้านหน้า
-                        </div>
-
-                    </div>
-
-                </div>
-
+              <div class="hint">คลิกเพื่อดูความหมาย</div>
             </div>
 
-        </div>
+            <!-- ด้านหลัง -->
+            <div class="face back">
+              <div class="meaning" id="thai">ยินดีต้อนรับ</div>
 
-        <div class="swipe-info">
-            <div class="progress" id="progress">
-                0 / 0
+              <div class="english" id="english">Welcome</div>
+
+              <div class="hint">คลิกเพื่อกลับด้านหน้า</div>
             </div>
+          </div>
         </div>
+      </div>
 
+      <div class="swipe-info">
+        <div class="progress" id="progress">0 / 0</div>
+      </div>
     </main>
-
-    <script src="../js/script.js"></script>
-
-</body>
+    <script src="js/script.js"></script>
+  </body>
 </html>

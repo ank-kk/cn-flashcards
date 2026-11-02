@@ -126,10 +126,7 @@ main {
     min-height: 280px;
     margin: auto;
 
-    /* สร้างพื้นที่ 3D */
     perspective: 1400px;
-
-    /* ปล่อยให้ Animation เคลื่อนออกได้อย่างเป็นธรรมชาติ */
     overflow: visible;
 }
 
@@ -181,7 +178,6 @@ main {
     background: var(--card);
     border-radius: 22px;
 
-    /* เงาจะเพิ่มความรู้สึกว่าการ์ดลอย */
     box-shadow:
         0 15px 40px rgba(0, 0, 0, 0.12);
 
@@ -234,7 +230,7 @@ main {
     font-size: 14px;
 }
 
-/* Swipe Information */
+/* Progress */
 
 .swipe-info {
     display: flex;
@@ -244,21 +240,18 @@ main {
     margin-top: 25px;
 }
 
-.swipe-hint {
-    color: var(--muted);
-    font-size: 14px;
-    text-align: center;
-}
-
 .progress {
     font-weight: bold;
     min-width: 80px;
     text-align: center;
 }
 
-/* Tablet */
+/* ========================================
+   Tablet
+======================================== */
 
 @media (max-width: 768px) {
+
     header {
         padding: 16px;
         flex-direction: column;
@@ -281,11 +274,34 @@ main {
     .card-wrap {
         height: 380px;
     }
+
+    /* ล็อกการเลื่อนหน้าจอเฉพาะมือถือ */
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+    }
+
+    /* แก้ขอบสีขาวเฉพาะมือถือ */
+    html {
+        background: var(--bg);
+    }
+
+    body {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+    }
 }
 
-/* Mobile */
+/* ========================================
+   Mobile
+======================================== */
 
 @media (max-width: 600px) {
+
     body {
         min-width: 0;
     }
@@ -311,6 +327,7 @@ main {
         min-width: 0;
     }
 
+    /* เลือก HSK ให้เต็มแถว */
     .hsk-select {
         grid-column: span 2;
     }
@@ -365,16 +382,13 @@ main {
         margin-top: 18px;
     }
 
-    .swipe-hint {
-        font-size: 12px;
-    }
-
     .progress {
         font-size: 14px;
     }
 }
 
 @media (max-width: 380px) {
+
     .controls {
         grid-template-columns: 1fr;
     }
@@ -389,6 +403,7 @@ main {
 }
 
 @media (max-height: 600px) and (orientation: landscape) {
+
     header {
         padding: 10px 16px;
     }
@@ -400,29 +415,5 @@ main {
 
     main {
         margin-top: 15px;
-    }
-}
-/* ========================================
-   Mobile: ล็อกหน้าจอและแก้ขอบสีขาว
-======================================== */
-
-@media (max-width: 768px) {
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        overscroll-behavior: none;
-    }
-
-    /* ให้พื้นหลังของขอบหน้าจอเปลี่ยนตาม Dark Mode */
-    html {
-        background: var(--bg);
-    }
-
-    body {
-        position: fixed;
-        inset: 0;
-        background: var(--bg);
     }
 }
