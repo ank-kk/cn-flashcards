@@ -1,14 +1,6 @@
-// ========================================
-// Chinese Flashcards
-// ========================================
-
 let words = [];
 let index = 0;
 let showPinyin = true;
-
-// ========================================
-// Cache Keys
-// ========================================
 
 const CACHE_KEY = "chineseFlashcardsData";
 const INDEX_KEY = "chineseFlashcardsIndex";
@@ -16,36 +8,20 @@ const HSK_KEY = "chineseFlashcardsHSK";
 const PINYIN_KEY = "chineseFlashcardsPinyin";
 const DARK_MODE_KEY = "flashcardDarkMode";
 
-// ========================================
-// เรียก HTML Element
-// ========================================
-
 const el = (id) => document.getElementById(id);
 
+const card = el("card");
+const cardSlider = el("cardSlider");
+
 // ========================================
-// บันทึก Cache
+// Cache
 // ========================================
 
 function saveCache() {
-    localStorage.setItem(
-        CACHE_KEY,
-        JSON.stringify(words)
-    );
-
-    localStorage.setItem(
-        INDEX_KEY,
-        index.toString()
-    );
-
-    localStorage.setItem(
-        PINYIN_KEY,
-        showPinyin ? "1" : "0"
-    );
+    localStorage.setItem(CACHE_KEY, JSON.stringify(words));
+    localStorage.setItem(INDEX_KEY, index.toString());
+    localStorage.setItem(PINYIN_KEY, showPinyin ? "1" : "0");
 }
-
-// ========================================
-// โหลด Cache
-// ========================================
 
 function loadCache() {
     const cachedWords = localStorage.getItem(CACHE_KEY);
@@ -81,16 +57,13 @@ function loadCache() {
         el("hskSelect").value = cachedHSK;
     }
 
-    if (
-        words.length > 0 &&
-        (index < 0 || index >= words.length)
-    ) {
+    if (words.length > 0 && (index < 0 || index >= words.length)) {
         index = 0;
     }
 }
 
 // ========================================
-// แสดง Flashcard
+// Render
 // ========================================
 
 function render() {
@@ -106,69 +79,262 @@ function render() {
     const word = words[index];
 
     el("word").textContent = word.Chinese || "-";
-
-    el("pinyin").textContent =
-        showPinyin ? (word.Pinyin || "") : "";
-
+    el("pinyin").textContent = showPinyin ? (word.Pinyin || "") : "";
     el("thai").textContent = word.Thai || "-";
-
     el("english").textContent = word.English || "";
+    el("progress").textContent = `${index + 1} / ${words.length}`;
 
-    el("progress").textContent =
-        `${index + 1} / ${words.length}`;
-
-    // กลับไปด้านหน้าทุกครั้งที่เปลี่ยนคำศัพท์
-    el("card").classList.remove("flipped");
+    card.classList.remove("flipped");
 
     saveCache();
 }
 
 // ========================================
-// พลิก Flashcard
+// เปลี่ยนคำศัพท์แบบ 3D Swipe
 // ========================================
 
-el("card").addEventListener("click", () => {
-    if (!words.length) return;
+function changeWord(direction) {
+    if (!words.length || cardSlider.classList.contains("animating")) {
+        return;
+    }
 
-    el("card").classList.toggle("flipped");
+    cardSlider.classList.add("animating");
+
+    const width = cardSlider.offsetWidth;
+
+    const exitX = direction === "left" ? -width * 1.2 : width * 1.2;
+    const exitRotate = direction === "left" ? -28 : 28;
+
+    cardSlider.style.transition =
+        "transform 0.3s cubic-bezier(.4, 0, .2, 1), opacity 0.3s ease";
+
+    cardSlider.style.transform =
+        `translateX(${exitX}px) rotateY(${exitRotate}deg) rotateZ(${exitRotate / 3}deg)`;
+
+    cardSlider.style.opacity = "0";
+
+    setTimeout(() => {
+
+        // ปัดซ้าย = ก่อนหน้า
+        if (direction === "left") {
+            index = (index - 1 + words.length) % words.length;
+        } else {
+            // ปัดขวา = ถัดไป
+            index = (index + 1) % words.length;
+        }
+
+        render();
+
+        // การ์ดใหม่เข้ามาจากฝั่งตรงข้าม
+        const enterX = direction === "left"
+            ? width * 1.2
+            : -width * 1.2;
+
+        const enterRotate = direction === "left"
+            ? 28
+            : -28;
+
+        cardSlider.style.transition = "none";
+        cardSlider.style.transform =
+            `translateX(${enterX}px) rotateY(${enterRotate}deg) rotateZ(${enterRotate / 3}deg)`;
+
+        cardSlider.style.opacity = "0";
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+
+                cardSlider.style.transition =
+                    "transform 0.45s cubic-bezier(.16, 1, .3, 1), opacity 0.35s ease";
+
+                cardSlider.style.transform =
+                    "translateX(0) rotateY(0deg) rotateZ(0deg)";
+
+                cardSlider.style.opacity = "1";
+
+                setTimeout(() => {
+                    cardSlider.style.transition = "";
+                    cardSlider.style.transform = "";
+                    cardSlider.style.opacity = "";
+                    cardSlider.classList.remove("animating");
+                }, 450);
+            });
+        });
+
+    }, 300);
+}
+
+// ========================================
+// Swipe Gesture
+// ========================================
+
+let startX = 0;
+let startY = 0;
+let isDragging = false;
+
+const SWIPE_THRESHOLD = 70;
+
+cardSlider.addEventListener("pointerdown", (event) => {
+
+    if (!words.length || cardSlider.classList.contains("animating")) {
+        return;
+    }
+
+    startX = event.clientX;
+    startY = event.clientY;
+    isDragging = true;
+
+    cardSlider.classList.add("dragging");
+    cardSlider.setPointerCapture(event.pointerId);
+});
+
+cardSlider.addEventListener("pointermove", (event) => {
+
+    if (!isDragging) return;
+
+    const diffX = event.clientX - startX;
+    const diffY = event.clientY - startY;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+
+        const rotateY = Math.max(
+            -20,
+            Math.min(20, diffX / 10)
+        );
+
+        const rotateZ = Math.max(
+            -8,
+            Math.min(8, diffX / 30)
+        );
+
+        const opacity = Math.max(
+            0.72,
+            1 - Math.abs(diffX) / 900
+        );
+
+        cardSlider.style.transform =
+            `translateX(${diffX}px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
+
+        cardSlider.style.opacity = opacity;
+    }
+});
+
+cardSlider.addEventListener("pointerup", (event) => {
+
+    if (!isDragging) return;
+
+    const diffX = event.clientX - startX;
+    const diffY = event.clientY - startY;
+
+    isDragging = false;
+    cardSlider.classList.remove("dragging");
+
+    try {
+        cardSlider.releasePointerCapture(event.pointerId);
+    } catch (error) {
+        // ไม่จำเป็นต้องทำอะไร
+    }
+
+    // ปัดสำเร็จ
+    if (
+        Math.abs(diffX) >= SWIPE_THRESHOLD &&
+        Math.abs(diffX) > Math.abs(diffY)
+    ) {
+
+        const direction = diffX < 0 ? "left" : "right";
+
+        // Reset ก่อนเริ่ม Animation
+        cardSlider.style.transition = "none";
+        cardSlider.style.transform = "";
+        cardSlider.style.opacity = "";
+
+        changeWord(direction);
+
+        return;
+    }
+
+    // ลากไม่ถึงระยะ → เด้งกลับ
+    if (Math.abs(diffX) > 10) {
+
+        cardSlider.style.transition =
+            "transform 0.4s cubic-bezier(.16, 1, .3, 1), opacity 0.3s ease";
+
+        cardSlider.style.transform =
+            "translateX(0) rotateY(0deg) rotateZ(0deg)";
+
+        cardSlider.style.opacity = "1";
+
+        setTimeout(() => {
+            cardSlider.style.transition = "";
+            cardSlider.style.transform = "";
+            cardSlider.style.opacity = "";
+        }, 400);
+
+        return;
+    }
+
+    // แตะหรือคลิก → พลิกการ์ด
+    card.classList.toggle("flipped");
 });
 
 // ========================================
-// คำศัพท์ถัดไป
+// 3D Hover Effect (เฉพาะ Mouse)
 // ========================================
 
-el("next").addEventListener("click", () => {
-    if (!words.length) return;
+cardSlider.addEventListener("pointermove", (event) => {
 
-    index = (index + 1) % words.length;
+    // ถ้ากำลังลากหรือเป็น Touch ไม่ใช้ Hover
+    if (
+        isDragging ||
+        event.pointerType !== "mouse" ||
+        cardSlider.classList.contains("animating")
+    ) {
+        return;
+    }
 
-    render();
+    const rect = cardSlider.getBoundingClientRect();
+
+    const mouseX =
+        event.clientX - rect.left;
+
+    const mouseY =
+        event.clientY - rect.top;
+
+    // คำนวณตำแหน่งเมาส์จากจุดกลาง
+    const percentX =
+        mouseX / rect.width - 0.5;
+
+    const percentY =
+        mouseY / rect.height - 0.5;
+
+    // จำกัดองศาการเอียง
+    const rotateY = percentX * 10;
+    const rotateX = percentY * -8;
+
+    cardSlider.style.transform =
+        `translateY(-6px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+});
+
+cardSlider.addEventListener("pointerleave", (event) => {
+
+    if (isDragging || event.pointerType !== "mouse") {
+        return;
+    }
+
+    cardSlider.style.transform =
+        "translateY(0) rotateX(0deg) rotateY(0deg)";
 });
 
 // ========================================
-// คำศัพท์ก่อนหน้า
-// ========================================
-
-el("prev").addEventListener("click", () => {
-    if (!words.length) return;
-
-    index =
-        (index - 1 + words.length) % words.length;
-
-    render();
-});
-
-// ========================================
-// เปิด / ปิด Pinyin
+// Pinyin
 // ========================================
 
 el("pinyinBtn").addEventListener("click", () => {
+
     showPinyin = !showPinyin;
 
-    el("pinyinBtn").textContent =
-        showPinyin
-            ? "🔤 ซ่อนพินอิน"
-            : "🔤 แสดงพินอิน";
+    el("pinyinBtn").textContent = showPinyin
+        ? "🔤 ซ่อนพินอิน"
+        : "🔤 แสดงพินอิน";
 
     render();
 });
@@ -178,15 +344,12 @@ el("pinyinBtn").addEventListener("click", () => {
 // ========================================
 
 function setDarkMode(enabled) {
-    document.body.classList.toggle(
-        "dark",
-        enabled
-    );
 
-    el("darkBtn").textContent =
-        enabled
-            ? "☀️ โหมดกลางวัน"
-            : "🌙 โหมดกลางคืน";
+    document.body.classList.toggle("dark", enabled);
+
+    el("darkBtn").textContent = enabled
+        ? "☀️ โหมดกลางวัน"
+        : "🌙 โหมดกลางคืน";
 
     localStorage.setItem(
         DARK_MODE_KEY,
@@ -195,17 +358,18 @@ function setDarkMode(enabled) {
 }
 
 el("darkBtn").addEventListener("click", () => {
-    const isDark =
-        !document.body.classList.contains("dark");
 
-    setDarkMode(isDark);
+    setDarkMode(
+        !document.body.classList.contains("dark")
+    );
 });
 
 // ========================================
-// สุ่มคำศัพท์
+// Shuffle
 // ========================================
 
 el("shuffleBtn").addEventListener("click", () => {
+
     if (!words.length) return;
 
     words = [...words].sort(
@@ -221,54 +385,37 @@ el("shuffleBtn").addEventListener("click", () => {
 });
 
 // ========================================
-// อ่านคอลัมน์จาก Excel
+// Excel Functions
 // ========================================
 
 function getColumn(object, possibleNames) {
+
     const key = Object.keys(object).find(
         (columnName) =>
             possibleNames.includes(
-                columnName
-                    .trim()
-                    .toLowerCase()
+                columnName.trim().toLowerCase()
             )
     );
 
     return key ? object[key] : "";
 }
 
-// ========================================
-// แปลงข้อมูล Excel
-// ========================================
-
 function parseExcelRows(rows) {
+
     return rows
         .map((row) => ({
             Chinese: getColumn(row, [
-                "chinese",
-                "จีน",
-                "汉字",
-                "汉语",
-                "中文",
-                "word",
-                "คำศัพท์"
+                "chinese", "จีน", "汉字", "汉语",
+                "中文", "word", "คำศัพท์"
             ]),
-
             Pinyin: getColumn(row, [
-                "pinyin",
-                "พินอิน"
+                "pinyin", "พินอิน"
             ]),
-
             Thai: getColumn(row, [
-                "thai",
-                "ไทย",
-                "ความหมายไทย"
+                "thai", "ไทย", "ความหมายไทย"
             ]),
-
             English: getColumn(row, [
-                "english",
-                "อังกฤษ",
-                "ความหมายอังกฤษ"
+                "english", "อังกฤษ", "ความหมายอังกฤษ"
             ])
         }))
         .filter((word) => word.Chinese);
@@ -286,10 +433,10 @@ el("hskSelect").addEventListener(
 
         if (!level) return;
 
-        const fileName =
-            `data/${level}.xlsx`;
+        const fileName = `data/${level}.xlsx`;
 
         try {
+
             el("status").textContent =
                 `⏳ กำลังโหลด ${level}...`;
 
@@ -304,9 +451,7 @@ el("hskSelect").addEventListener(
                 await response.arrayBuffer();
 
             const workbook =
-                XLSX.read(data, {
-                    type: "array"
-                });
+                XLSX.read(data, { type: "array" });
 
             const sheet =
                 workbook.Sheets[
@@ -316,9 +461,7 @@ el("hskSelect").addEventListener(
             const rows =
                 XLSX.utils.sheet_to_json(
                     sheet,
-                    {
-                        defval: ""
-                    }
+                    { defval: "" }
                 );
 
             const parsedWords =
@@ -333,7 +476,6 @@ el("hskSelect").addEventListener(
             words = parsedWords;
             index = 0;
 
-            // จำระดับ HSK
             localStorage.setItem(
                 HSK_KEY,
                 level
@@ -345,6 +487,7 @@ el("hskSelect").addEventListener(
                 `📚 ${level}: โหลดสำเร็จ ${words.length} คำศัพท์`;
 
         } catch (error) {
+
             console.error(error);
 
             el("status").textContent =
@@ -357,38 +500,28 @@ el("hskSelect").addEventListener(
 // เริ่มต้นเว็บไซต์
 // ========================================
 
-// โหลด Cache
 loadCache();
 
-// โหลด Dark Mode
-if (
-    localStorage.getItem(DARK_MODE_KEY) === "1"
-) {
+if (localStorage.getItem(DARK_MODE_KEY) === "1") {
     setDarkMode(true);
 }
 
-// แสดงสถานะปุ่ม Pinyin
-el("pinyinBtn").textContent =
-    showPinyin
-        ? "🔤 ซ่อนพินอิน"
-        : "🔤 แสดงพินอิน";
+el("pinyinBtn").textContent = showPinyin
+    ? "🔤 ซ่อนพินอิน"
+    : "🔤 แสดงพินอิน";
 
-// แสดงสถานะล่าสุด
 if (words.length > 0) {
+
     const savedHSK =
         localStorage.getItem(HSK_KEY);
 
-    if (savedHSK) {
-        el("status").textContent =
-            `📌 กำลังเรียน ${savedHSK}: ${words.length} คำศัพท์`;
-    } else {
-        el("status").textContent =
-            `📌 โหลดคำศัพท์ล่าสุด ${words.length} คำ`;
-    }
+    el("status").textContent = savedHSK
+        ? `📌 กำลังเรียน ${savedHSK}: ${words.length} คำศัพท์`
+        : `📌 โหลดคำศัพท์ล่าสุด ${words.length} คำ`;
+
 } else {
     el("status").textContent =
         "เลือกระดับ HSK เพื่อเริ่มเรียน";
 }
 
-// แสดง Flashcard
 render();

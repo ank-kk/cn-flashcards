@@ -6,8 +6,7 @@
 
     <title>Chinese Flashcards</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 
     <!-- Library สำหรับอ่านไฟล์ Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -20,7 +19,6 @@
 
         <div class="controls">
 
-            <!-- เลือกระดับ HSK -->
             <select id="hskSelect" class="hsk-select">
                 <option value="">📚 เลือกระดับ HSK</option>
                 <option value="HSK1">HSK 1</option>
@@ -31,17 +29,14 @@
                 <option value="HSK6">HSK 6</option>
             </select>
 
-            <!-- เปิด / ปิด Pinyin -->
             <button class="secondary" id="pinyinBtn">
                 🔤 ซ่อนพินอิน
             </button>
 
-            <!-- Dark Mode -->
             <button class="secondary" id="darkBtn">
                 🌙 โหมดกลางคืน
             </button>
 
-            <!-- สุ่มคำศัพท์ -->
             <button class="secondary" id="shuffleBtn">
                 🔀 สุ่มคำศัพท์
             </button>
@@ -49,51 +44,52 @@
         </div>
     </header>
 
-
     <main>
 
-        <!-- สถานะ -->
         <div class="status" id="status">
             เลือกระดับ HSK เพื่อเริ่มเรียน
         </div>
 
-
         <!-- Flashcard -->
-        <div class="card-wrap">
+        <div class="card-wrap" id="cardWrap">
 
-            <div class="card" id="card">
+            <!-- ใช้สำหรับ Swipe และ Hover 3D -->
+            <div class="card-slider" id="cardSlider">
 
-                <!-- ด้านหน้า -->
-                <div class="face front">
+                <div class="card" id="card">
 
-                    <div class="chinese" id="word">
-                        欢迎
+                    <!-- ด้านหน้า -->
+                    <div class="face front">
+
+                        <div class="chinese" id="word">
+                            欢迎
+                        </div>
+
+                        <div class="pinyin" id="pinyin">
+                            huānyíng
+                        </div>
+
+                        <div class="hint">
+                            คลิกเพื่อดูความหมาย
+                        </div>
+
                     </div>
 
-                    <div class="pinyin" id="pinyin">
-                        huānyíng
-                    </div>
+                    <!-- ด้านหลัง -->
+                    <div class="face back">
 
-                    <div class="hint">
-                        คลิกเพื่อดูความหมาย
-                    </div>
+                        <div class="meaning" id="thai">
+                            ยินดีต้อนรับ
+                        </div>
 
-                </div>
+                        <div class="english" id="english">
+                            Welcome
+                        </div>
 
+                        <div class="hint">
+                            คลิกเพื่อกลับด้านหน้า
+                        </div>
 
-                <!-- ด้านหลัง -->
-                <div class="face back">
-
-                    <div class="meaning" id="thai">
-                        ยินดีต้อนรับ
-                    </div>
-
-                    <div class="english" id="english">
-                        Welcome
-                    </div>
-
-                    <div class="hint">
-                        คลิกเพื่อกลับด้านหน้า
                     </div>
 
                 </div>
@@ -102,29 +98,17 @@
 
         </div>
 
+        <div class="swipe-info">
 
-        <!-- ปุ่มเปลี่ยนคำศัพท์ -->
-        <div class="navigation">
+    <div class="progress" id="progress">
+        0 / 0
+    </div>
 
-            <button id="prev">
-                ← ก่อนหน้า
-            </button>
-
-            <div class="progress" id="progress">
-                0 / 0
-            </div>
-
-            <button id="next">
-                ถัดไป →
-            </button>
-
-        </div>
+</div>
 
     </main>
 
-
-    <!-- JavaScript -->
-    <script src="js/script.js"></script>
+    <script src="../js/script.js"></script>
 
 </body>
 </html>
